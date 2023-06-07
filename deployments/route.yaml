@@ -1,0 +1,19 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: product-reviews
+  labels:
+    app.kubernetes.io/instance: globex
+    app.kubernetes.io/name: product-reviews
+spec:
+  host: 
+  to:
+    kind: Service
+    name: product-reviews
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

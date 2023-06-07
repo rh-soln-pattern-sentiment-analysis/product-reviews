@@ -1,4 +1,4 @@
-package org.globex.retail;
+package org.globex.retail.validator;
 
 import java.io.IOException;
 import java.io.InputStream;

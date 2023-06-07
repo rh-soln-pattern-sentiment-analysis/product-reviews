@@ -1,3 +1,32 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: product-reviews
+  labels:
+    app.kubernetes.io/instance: globex
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: product-reviews
+type: "Opaque"
+stringData:
+  application.properties: |-
+    mp.messaging.outgoing.product-reviews.bootstrap.servers=kafka-kafka-bootstrap.globex-mw-user1.svc.cluster.local:9092
+    mp.messaging.outgoing.product-reviews.topic=globex.reviews
+    mp.messaging.connector.smallrye-kafka.security.protocol=SASL_PLAINTEXT
+    mp.messaging.connector.smallrye-kafka.sasl.mechanism=SCRAM-SHA-512
+    mp.messaging.connector.smallrye-kafka.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required \
+      username="globex" \
+      password="globex" ; 
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: product-reviews
+  labels:
+    app.kubernetes.io/instance: globex
+    app.kubernetes.io/name: product-reviews
+  
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,32 +51,12 @@ spec:
       serviceAccountName: product-reviews
       containers:
         - name: product-reviews
-          image: 'quay.io/cloud-architecture-workshop/activity-tracking-service:latest'
+          image: 'quay.io/globex-sentiment-analysis/product-reviews:latest'
           imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /q/health/live
-              port: http
-              scheme: HTTP
-            initialDelaySeconds: 30
-            timeoutSeconds: 3
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              path: /q/health/ready
-              port: http
-              scheme: HTTP
-            initialDelaySeconds: 5
-            timeoutSeconds: 3
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 3
           resources:
             limits:
               cpu: 250m
@@ -67,3 +76,45 @@ spec:
         - name: config
           secret:
             secretName: product-reviews
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-reviews
+  labels:
+    app.kubernetes.io/instance: globex
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: product-reviews
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/instance: globex
+    app.kubernetes.io/name: product-reviews
+
+---
+
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: product-reviews
+  labels:
+    app.kubernetes.io/instance: globex
+    app.kubernetes.io/name: product-reviews
+spec:
+  path: /
+  to:
+    kind: Service
+    name: product-reviews
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

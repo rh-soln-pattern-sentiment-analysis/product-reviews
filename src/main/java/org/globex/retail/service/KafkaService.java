@@ -1,4 +1,4 @@
-package org.globex.retail;
+package org.globex.retail.service;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
