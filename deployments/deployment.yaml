@@ -16,6 +16,10 @@ stringData:
     mp.messaging.connector.smallrye-kafka.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required \
       username="globex" \
       password="globex" ; 
+    quarkus.datasource.username=globex
+    quarkus.datasource.password=globex
+    quarkus.datasource.jdbc.url=jdbc:postgresql://product-reviews-db:5432/reviews
+    quarkus.datasource.db-kind=postgresql
 
 ---
 apiVersion: v1

@@ -15,7 +15,7 @@ import io.smallrye.mutiny.infrastructure.Infrastructure;
 
 import org.everit.json.schema.ValidationException;
 import org.globex.retail.service.KafkaService;
-
+import org.globex.retail.service.ProductReviewService;
 import org.globex.retail.validator.JsonSchemaValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,8 @@ public class ProductReviewResource {
     @Inject
     KafkaService kafkaService;
 
-    
+    @Inject
+    ProductReviewService productReviewService;
     
 
 
@@ -53,4 +54,24 @@ public class ProductReviewResource {
                 });
     }
 
-    }
+    @GET
+    @Path("/list/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<Response> getCategoryList(@PathParam("id") String id) {
+        
+        return Uni.createFrom().voidItem().emitOn(Infrastructure.getDefaultWorkerPool())
+                .onItem().transform(produdctReviewsList -> productReviewService.getProductRreviewsList(id))    
+                .onItem().transform(produdctReviewsList -> {
+                    if (produdctReviewsList == null) {
+                        return Response.status(Response.Status.NOT_FOUND).build();
+                    } else {
+                        return Response.ok(produdctReviewsList).build();
+                    }
+                })
+                .onFailure().recoverWithItem(throwable -> {
+                    LOGGER.error("Exception while fetching category list", throwable);
+                    return Response.serverError().build();
+                });          
+    }   
+
+}
