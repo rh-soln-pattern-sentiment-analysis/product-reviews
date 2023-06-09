@@ -13,8 +13,8 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 @ApplicationScoped
 public class KafkaService {
 
-    //@Inject
-    //@Channel("product-reviews")
+    @Inject
+    @Channel("product-reviews")
     Emitter<String> emitter;
 
     public void emit(String payload) {
