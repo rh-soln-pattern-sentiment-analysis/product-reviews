@@ -13,6 +13,10 @@ stringData:
     mp.messaging.outgoing.product-reviews.topic=globex.reviews
     mp.messaging.connector.smallrye-kafka.security.protocol=SASL_PLAINTEXT
     mp.messaging.connector.smallrye-kafka.sasl.mechanism=SCRAM-SHA-512
+    mp.messaging.outgoing.product-reviews.cloud-events-source=reviews-generators
+    mp.messaging.outgoing.product-reviews.cloud-events-type=reviews
+    mp.messaging.outgoing.product-reviews.cloud-events-subject=product-reviews
+    mp.messaging.outgoing.product-reviews.cloud-events-mode=structured
     mp.messaging.connector.smallrye-kafka.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required \
       username="globex" \
       password="globex" ; 
