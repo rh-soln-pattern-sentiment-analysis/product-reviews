@@ -14,6 +14,7 @@ import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
 
 import org.everit.json.schema.ValidationException;
+import org.globex.retail.model.dto.ProductReviewDto;
 import org.globex.retail.service.KafkaService;
 import org.globex.retail.service.ProductReviewService;
 import org.globex.retail.validator.JsonSchemaValidator;
@@ -39,7 +40,7 @@ public class ProductReviewResource {
     @POST
     @Path("/submit")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Uni<Response> submitReview(String payload) {
+    public Uni<Response> submitReview(ProductReviewDto payload) {
         return Uni.createFrom().item(() -> payload)//.onItem().invoke(p -> validator.validate(p))
                 .onItem().invoke(p -> kafkaService.emit(p))
                 .onItem().transform(p -> Response.status(200).build())
