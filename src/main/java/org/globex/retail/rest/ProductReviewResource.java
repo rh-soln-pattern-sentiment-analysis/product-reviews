@@ -10,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
 
@@ -40,6 +41,7 @@ public class ProductReviewResource {
     @POST
     @Path("/submit")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Blocking
     public Uni<Response> submitReview(ProductReviewDto payload) {
         return Uni.createFrom().item(() -> payload)//.onItem().invoke(p -> validator.validate(p))
                 .onItem().invoke(p -> kafkaService.emit(p))
@@ -58,7 +60,7 @@ public class ProductReviewResource {
     @GET
     @Path("/list/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> getCategoryList(@PathParam("id") String id) {
+    public Uni<Response> getReviewsList(@PathParam("id") String id) {
         
         return Uni.createFrom().voidItem().emitOn(Infrastructure.getDefaultWorkerPool())
                 .onItem().transform(produdctReviewsList -> productReviewService.getProductRreviewsList(id))    
@@ -70,7 +72,7 @@ public class ProductReviewResource {
                     }
                 })
                 .onFailure().recoverWithItem(throwable -> {
-                    LOGGER.error("Exception while fetching category list", throwable);
+                    LOGGER.error("Exception while fetching reviews list", throwable);
                     return Response.serverError().build();
                 });          
     }   
