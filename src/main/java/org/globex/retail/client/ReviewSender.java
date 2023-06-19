@@ -14,7 +14,7 @@ import org.globex.retail.model.dto.ProductReviewDto;
 public interface ReviewSender {
 
     @POST
-    @Path("/reviews-sink")
+    @Path("/")
     void send(ProductReviewDto productReviewDto);
 
 }
